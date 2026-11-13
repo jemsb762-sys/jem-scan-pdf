@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10131b">
+  <meta name="description" content="Scan documents, enhance pages and create PDFs on your device.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Jem Scan PDF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Jem Scan PDF</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Jem Scan PDF home">
+        <span class="brand-mark">J</span>
+        <span><b>JEM SCAN</b><small>PDF STUDIO</small></span>
+      </a>
+      <button id="installBtn" class="icon-btn hidden" type="button" aria-label="Install app">↓</button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow"><span class="live-dot"></span> PRIVATE · ON-DEVICE WORKSPACE</div>
+        <h1>Your documents.<br><span>Perfectly scanned.</span></h1>
+        <p>Capture, refine and save professional PDFs — right on your device.</p>
+      </section>
+
+      <section class="action-grid" aria-label="Create document">
+        <button class="action-card primary" id="cameraBtn" type="button">
+          <span class="action-icon">▣</span><b>Scan with camera</b><small>Capture a paper document</small>
+        </button>
+        <button class="action-card" id="photosBtn" type="button">
+          <span class="action-icon">▧</span><b>Import photos</b><small>Choose images from gallery</small>
+        </button>
+        <button class="action-card" id="pdfBtn" type="button">
+          <span class="action-icon">PDF</span><b>Import PDF</b><small>Add pages from a PDF</small>
+        </button>
+        <button class="action-card" id="filesBtn" type="button">
+          <span class="action-icon">＋</span><b>Browse files</b><small>Select images or PDFs</small>
+        </button>
+      </section>
+
+      <section id="workspace" class="panel hidden">
+        <div class="section-heading">
+          <div><div class="eyebrow">DOCUMENT WORKSPACE</div><h2>Current scan</h2></div>
+          <button id="clearBtn" class="text-btn" type="button">Clear all</button>
+        </div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-symbol">▤</div><b>No pages added yet</b><span>Scan a page or import a photo to get started.</span>
+        </div>
+        <div id="pageList" class="page-list"></div>
+        <div class="editor-tools">
+          <label class="field-label" for="docName">PDF file name</label>
+          <input id="docName" type="text" value="My Scanned Document" maxlength="80">
+          <div class="tool-row">
+            <label class="field-label" for="pageSize">Page size</label>
+            <select id="pageSize"><option value="a4">A4</option><option value="letter">US Letter</option><option value="fit">Fit to image</option></select>
+          </div>
+          <button id="createPdfBtn" class="main-btn" type="button" disabled>Create PDF <span>→</span></button>
+        </div>
+      </section>
+
+      <section class="saved-section">
+        <div class="section-heading"><div><div class="eyebrow">YOUR DEVICE</div><h2>Saved documents</h2></div><span class="count" id="savedCount">0</span></div>
+        <div id="savedList" class="saved-list">
+          <div class="saved-empty">Your saved PDFs will appear here.</div>
+        </div>
+        <p class="privacy-note">🔒 Your documents stay in this browser on this device. Nothing is uploaded to a server.</p>
+      </section>
+    </main>
+    <footer>JEM SCAN PDF <span>·</span> SIMPLE. PRIVATE. PROFESSIONAL.</footer>
+  </div>
+
+  <input id="photoInput" type="file" accept="image/*" multiple hidden>
+  <input id="pdfInput" type="file" accept="application/pdf,.pdf" multiple hidden>
+  <input id="fileInput" type="file" accept="image/*,application/pdf,.pdf" multiple hidden>
+
+  <div id="cameraModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Camera scanner">
+    <div class="modal-card camera-card">
+      <div class="modal-head"><div><div class="eyebrow">LIVE SCANNER</div><h2>Capture document</h2></div><button class="close-btn" data-close="cameraModal" type="button">×</button></div>
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <p class="hint" id="cameraHint">Place the document inside the camera frame.</p>
+      <div class="modal-actions"><button id="switchCameraBtn" class="secondary-btn" type="button">Switch camera</button><button id="captureBtn" class="main-btn" type="button">Capture page</button></div>
+    </div>
+  </div>
+
+  <div id="cropModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Edit page">
+    <div class="modal-card">
+      <div class="modal-head"><div><div class="eyebrow">PAGE EDITOR</div><h2>Adjust your page</h2></div><button class="close-btn" data-close="cropModal" type="button">×</button></div>
+      <div class="crop-wrap"><img id="cropImage" alt="Page to crop"></div>
+      <div class="crop-controls">Crop edges (%) <div class="crop-inputs">
+        <label>Top<input id="cropTop" type="number" min="0" max="45" value="0"></label>
+        <label>Right<input id="cropRight" type="number" min="0" max="45" value="0"></label>
+        <label>Bottom<input id="cropBottom" type="number" min="0" max="45" value="0"></label>
+        <label>Left<input id="cropLeft" type="number" min="0" max="45" value="0"></label>
+      </div></div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="original" type="button">Original</button>
+        <button class="filter-btn" data-filter="document" type="button">Document</button>
+        <button class="filter-btn" data-filter="gray" type="button">Grayscale</button>
+        <button class="filter-btn" data-filter="bw" type="button">B&W</button>
+      </div>
+      <div class="modal-actions"><button id="rotateBtn" class="secondary-btn" type="button">↻ Rotate</button><button id="saveEditBtn" class="main-btn" type="button">Save changes</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
